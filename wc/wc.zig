@@ -8,27 +8,27 @@ pub fn main() !void {
     var nw: usize = 0;
     var nc: usize = 0;
 
-    const IN = true;
-    const OUT = false;
+    const State = enum {
+        In,
+        Out,
+    };
 
-    var state = OUT;
+    var state = State.Out;
 
-    while (true) {
-        const c = stdin.readByte() catch |err| switch (err) {
-            error.EndOfStream => break,
-            else => return err,
-        };
-
+    while (stdin.readByte()) |c| {
         nc += 1;
         if (c == '\n') {
             nl += 1;
         }
-        if (c == ' ' or c == '\n' or c == '\n') {
-            state = OUT;
-        } else if (state == OUT) {
+        if (c == ' ' or c == '\n' or c == '\t') {
+            state = State.Out;
+        } else if (state == State.Out) {
             nw += 1;
-            state = IN;
+            state = State.In;
         }
+    } else |err| switch (err) {
+        error.EndOfStream => {}, // EOF
+        else => return err,
     }
 
     try stdout.print("{d} {d} {d}\n", .{ nl, nw, nc });
